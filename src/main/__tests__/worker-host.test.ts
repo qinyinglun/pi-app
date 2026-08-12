@@ -52,6 +52,7 @@ vi.mock('child_process', () => ({
 vi.mock('../wsl/wsl-exec', () => ({
   runWslDistroCdSync: mocks.runWslDistroCdSync,
   wslHomeDirSync: vi.fn(() => '/root'),
+  wslDefaultShellSync: vi.fn(() => 'bash'),
 }))
 
 vi.mock('@shared/wsl-path', () => ({

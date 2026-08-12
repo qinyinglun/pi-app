@@ -4,7 +4,7 @@ import type { AppEvent } from '@shared/app-events'
 import type { WorkerResponsePayload } from '@shared/worker-rpc-types'
 import { windowsPathToWsl } from '@shared/wsl-path'
 import { resolveActiveSdk } from './sdk-loader'
-import type { WorkerInitResult, WorkerSlot } from './worker-manager-types'
+import type { WorkerInitResult, WorkerRuntimeIdentity, WorkerSlot } from './worker-manager-types'
 import { readMaxSessionWorkers, minutesToIdleDelayMs, readSessionWorkerIdleTimeoutMinutes } from './worker-pool-config'
 import { normalizeSessionKey, workspacePoolKey } from './worker-session-key'
 import {
@@ -19,7 +19,7 @@ import { syncWorkerBundleToWsl } from './wsl/worker-host'
 function createSlot(
   poolKey: string,
   cwd: string,
-  runtime: { mode: 'host' | 'wsl'; distro: string | null },
+  runtime: WorkerRuntimeIdentity,
   worker: WorkerTransport,
   sessionFile: string | null = null,
 ): WorkerSlot {
@@ -221,7 +221,7 @@ export async function disposeWorkerSlot(slot: WorkerSlot): Promise<void> {
   }
   slot.initPromise = null
   const proc = slot.worker
-  const wasActive = !!slot.agentTurnActive
+  const wasActive = slot.agentTurnActive
   // Always try abort on dispose when we have a session file — agentTurnActive can lag
   // behind true streaming if events were missed, and force-quit needs a terminal leaf.
   if (wasActive || slot.sessionFile) {
